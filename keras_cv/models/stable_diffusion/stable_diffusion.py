@@ -238,9 +238,21 @@ class StableDiffusionBase:
             # Keras backend array need to cast explicitly
             target_dtype = latent_prev.dtype
             latent = ops.cast(latent, target_dtype)
-            pred_x0 = (latent_prev - math.sqrt(1 - a_t) * latent) / math.sqrt(
-                a_t
-            )
+
+#######################################################################################
+#            pred_x0 = (latent_prev - math.sqrt(1 - a_t) * latent) / math.sqrt(
+#                a_t
+#            )
+
+            # GB 11/1/24
+            # Convert both tensors to float32 before the operation
+            latent_prev = tf.cast(latent_prev, dtype=tf.float32)
+            latent = tf.cast(latent, dtype=tf.float32)
+
+            # Then the operation as it is
+            pred_x0 = (latent_prev - math.sqrt(1 - a_t) * latent) / math.sqrt(a_t)
+#######################################################################################
+
             latent = (
                 ops.array(latent) * math.sqrt(1.0 - a_prev)
                 + math.sqrt(a_prev) * pred_x0
